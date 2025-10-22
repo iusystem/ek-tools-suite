@@ -1,0 +1,2182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EK Tools Suite</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+    }
+    
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 260px;
+      background: white;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidebar-header {
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .sidebar-header h1 {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+    
+    .sidebar-header p {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+    
+    .nav-menu {
+      flex: 1;
+      padding: 20px 0;
+    }
+    
+    .nav-item {
+      padding: 15px 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-left: 4px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .nav-item:hover {
+      background: #f8f9fa;
+    }
+    
+    .nav-item.active {
+      background: linear-gradient(to right, #667eea10 0%, transparent 100%);
+      border-left-color: #667eea;
+      color: #667eea;
+      font-weight: 500;
+    }
+    
+    .nav-icon {
+      width: 24px;
+      text-align: center;
+    }
+    
+    .nav-settings {
+      padding: 20px;
+      border-top: 1px solid #e0e0e0;
+    }
+    
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+    
+    .module-container {
+      display: none;
+      animation: fadeIn 0.3s;
+    }
+    
+    .module-container.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .card h2 {
+      color: #202124;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #5f6368;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #f1f3f4;
+      color: #5f6368;
+    }
+    
+    .btn-secondary:hover {
+      background: #e8eaed;
+    }
+    
+    .btn-success {
+      background: #34a853;
+      color: white;
+    }
+    
+    .btn-warning {
+      background: #fbbc04;
+      color: #202124;
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .status-message {
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      display: none;
+      animation: slideIn 0.3s;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .status-success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-left: 4px solid #4caf50;
+    }
+    
+    .status-error {
+      background: #ffebee;
+      color: #c62828;
+      border-left: 4px solid #f44336;
+    }
+    
+    .status-info {
+      background: #e3f2fd;
+      color: #1976d2;
+      border-left: 4px solid #2196f3;
+    }
+    
+    .file-list {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 10px;
+    }
+    
+    .file-item {
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .file-item:hover {
+      background: #f8f9fa;
+    }
+    
+    .file-item.selected {
+      background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+      border: 1px solid #667eea;
+    }
+    
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.3s;
+    }
+    
+    .modal-content {
+      background: white;
+      margin: 50px auto;
+      padding: 30px;
+      border-radius: 16px;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+      animation: slideDown 0.3s;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: #5f6368;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 20px;
+      background: #f8f9fa;
+      padding: 5px;
+      border-radius: 10px;
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 10px;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .tab.active {
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 20px;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Progress Bar */
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+    
+    /* Path Preview */
+    .path-preview {
+      padding: 10px;
+      background: #f0f0f0;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 12px;
+      margin-top: 10px;
+      color: #333;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 200px;
+      }
+      
+      .main-content {
+        padding: 20px;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      body {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        order: 2;
+      }
+      
+      .main-content {
+        order: 1;
+      }
+    }
+    
+    /* Loading Spinner */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Audio Test Button Styles */
+    .audio-test-btn {
+      padding: 5px 10px;
+      font-size: 12px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .audio-test-btn:hover {
+      background: #5a6dd8;
+      transform: translateY(-1px);
+    }
+    
+    .audio-test-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .audio-test-btn .loading-spinner {
+      width: 12px;
+      height: 12px;
+      border-width: 2px;
+      margin-left: 5px;
+    }
+    
+    /* Regeneration Modal Styles */
+    .regen-modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.3s;
+    }
+    
+    .regen-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .regen-modal-content {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      animation: slideDown 0.3s;
+    }
+    
+    .regen-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .regen-modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #202124;
+    }
+    
+    .regen-modal-close {
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: #5f6368;
+      line-height: 1;
+    }
+    
+    .regen-filename {
+      font-family: monospace;
+      font-size: 14px;
+      color: #5f6368;
+      margin-bottom: 20px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 6px;
+    }
+    
+    .regen-textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+      margin-bottom: 20px;
+    }
+    
+    .regen-textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .regen-sliders {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .regen-slider-group {
+      margin-bottom: 15px;
+    }
+    
+    .regen-slider-group:last-child {
+      margin-bottom: 0;
+    }
+    
+    .regen-slider-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #5f6368;
+    }
+    
+    .regen-slider {
+      width: 100%;
+      height: 4px;
+      border-radius: 2px;
+      background: #e0e0e0;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    
+    .regen-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #667eea;
+      cursor: pointer;
+    }
+    
+    .regen-slider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #667eea;
+      cursor: pointer;
+      border: none;
+    }
+    
+    .regen-modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    
+    .audio-status-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      margin-right: 5px;
+    }
+    
+    .audio-status-badge.has-audio {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .audio-status-badge.no-audio {
+      background: #ffebee;
+      color: #c62828;
+    }
+    
+    .regen-btn {
+      padding: 4px 8px;
+      font-size: 11px;
+      background: #fbbc04;
+      color: #202124;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .regen-btn:hover {
+      background: #f9a602;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h1>EK Tools Suite</h1>
+      <p>All-in-one EK content management</p>
+    </div>
+    
+    <div class="nav-menu">
+      <div class="nav-item active" onclick="window.switchModule('sheets-to-slides')">
+        <span class="nav-icon">📊</span>
+        <span>Sheets to Slides</span>
+      </div>
+      <div class="nav-item" onclick="window.switchModule('audio-export')">
+        <span class="nav-icon">🎙️</span>
+        <span>Audio Export</span>
+      </div>
+      <div class="nav-item" onclick="window.switchModule('slides-to-sheets')">
+        <span class="nav-icon">📑</span>
+        <span>Slides to Sheets</span>
+      </div>
+    </div>
+    
+    <div class="nav-settings">
+      <button id="settingsBtn" class="btn btn-secondary" style="width: 100%;" onclick="window.showSettings()">
+        ⚙️ Settings
+      </button>
+    </div>
+  </div>
+  
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Module 1: Sheets to Slides -->
+    <div id="sheets-to-slides" class="module-container active">
+      <div class="card">
+        <h2>📊 Generate Slides from Spreadsheet</h2>
+        
+        <div class="form-group">
+          <label>Select or Enter EK Spreadsheet:</label>
+          <select id="s2s-sheetSelect" class="form-control" onchange="window.updateS2SSheetUrl()">
+            <option value="">-- Select a spreadsheet --</option>
+          </select>
+          <input type="url" id="s2s-sheetUrl" class="form-control" placeholder="Or paste spreadsheet URL here" style="margin-top: 10px;">
+          <button class="btn btn-secondary" onclick="window.refreshS2SSheets()">🔄 Refresh</button>
+        </div>
+        
+        <div class="form-group">
+          <label>Template Slide ID (optional):</label>
+          <input type="text" id="s2s-templateId" class="form-control" placeholder="Leave blank to use default template">
+          <small style="color: #666;">Default: 1fLGPIDEhqXIblC5gya8ck9bN5U03WJLYFhfUOkUzbtc</small>
+        </div>
+        
+        <div class="form-group">
+          <label>Badge Image (optional):</label>
+          <input type="file" id="s2s-badgeImage" accept="image/*" onchange="window.previewBadge()">
+          <div id="s2s-badgePreview" style="margin-top: 10px; display: none;">
+            <img style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; border-radius: 8px;">
+          </div>
+        </div>
+        
+        <div>
+          <button class="btn btn-primary" onclick="window.generateSlides()">🚀 Generate Slides</button>
+          <button class="btn btn-secondary" onclick="window.clearS2SForm()">🔄 Clear</button>
+        </div>
+        
+        <div id="s2s-status" class="status-message"></div>
+        
+        <div id="s2s-result" style="display: none; margin-top: 20px; padding: 20px; background: #e8f5e9; border-radius: 8px;">
+          <h3 style="color: #2e7d32;">✅ Success!</h3>
+          <p><strong>Presentation Name:</strong> <span id="s2s-presentationName"></span></p>
+          <p><strong>Text Replacements:</strong> <span id="s2s-textReplacements"></span></p>
+          <p><strong>Images Replaced:</strong> <span id="s2s-imageReplacements"></span></p>
+          <p><a id="s2s-presentationLink" href="#" target="_blank" style="color: #1a73e8; font-weight: bold;">🎯 Open Generated Presentation</a></p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Module 2: Audio Export with Regeneration -->
+    <div id="audio-export" class="module-container">
+      <div class="card">
+        <h2>🎙️ Generate Audio & Export CSV</h2>
+        
+        <div class="form-group">
+          <label>Search Spreadsheets:</label>
+          <input type="text" id="ae-searchInput" class="form-control" placeholder="Search by name..." onkeyup="if(event.key === 'Enter') window.searchAESpreadsheets()">
+          <button class="btn btn-secondary" onclick="window.searchAESpreadsheets()">🔍 Search</button>
+          <button class="btn btn-secondary" onclick="window.refreshAESpreadsheets()">🔄 Refresh</button>
+        </div>
+        
+        <div class="form-group">
+          <label>Select Spreadsheet:</label>
+          <div id="ae-spreadsheetList" class="file-list">
+            <div style="text-align: center; padding: 20px; color: #666;">
+              Loading spreadsheets...
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Options:</label>
+          <div style="padding: 10px; background: #f8f9fa; border-radius: 8px;">
+            <label style="display: block; margin-bottom: 10px;">
+              <input type="checkbox" id="ae-skipExisting"> Skip rows with existing audio
+            </label>
+            <label style="display: block;">
+              <input type="checkbox" id="ae-testMode"> Test mode (process first 3 rows only)
+            </label>
+          </div>
+        </div>
+        
+        <div>
+          <button class="btn btn-secondary" onclick="window.generateAudioPreview()">👁️ Preview</button>
+          <button class="btn btn-primary" onclick="window.processAudioExport()">🚀 Generate Audio & CSV</button>
+          <button class="btn btn-warning" onclick="window.testAudioConnections()">🔧 Test Connections</button>
+        </div>
+        
+        <div id="ae-status" class="status-message"></div>
+        
+        <div id="ae-preview" style="display: none; margin-top: 20px;">
+          <h3>Preview of Audio Files</h3>
+          <div id="ae-previewContent" style="max-height: 400px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px;"></div>
+        </div>
+        
+        <div id="ae-progress" style="display: none;">
+          <div class="progress-bar">
+            <div id="ae-progressFill" class="progress-fill"></div>
+          </div>
+          <p id="ae-progressText" style="text-align: center; margin-top: 10px;">Processing...</p>
+        </div>
+        
+        <div id="ae-results" style="display: none; margin-top: 20px;"></div>
+      </div>
+    </div>
+    
+    <!-- Audio Regeneration Modal -->
+    <div id="audioRegenModal" class="regen-modal">
+      <div class="regen-modal-content">
+        <div class="regen-modal-header">
+          <div class="regen-modal-title">🔄 Regenerate Audio</div>
+          <button class="regen-modal-close" onclick="window.closeRegenModal()">&times;</button>
+        </div>
+        
+        <div class="regen-filename" id="regen-filename">Filename: </div>
+        
+        <div class="form-group">
+          <label>Text to Convert:</label>
+          <textarea id="regen-text" class="regen-textarea" placeholder="Enter the text for audio generation..."></textarea>
+        </div>
+        
+        <div class="regen-sliders">
+          <div class="regen-slider-group">
+            <div class="regen-slider-label">
+              <span>Stability</span>
+              <span id="regen-stability-value">50%</span>
+            </div>
+            <input type="range" id="regen-stability" class="regen-slider" min="0" max="100" value="50" 
+                   oninput="window.updateRegenSlider('stability')">
+          </div>
+          
+          <div class="regen-slider-group">
+            <div class="regen-slider-label">
+              <span>Similarity</span>
+              <span id="regen-similarity-value">75%</span>
+            </div>
+            <input type="range" id="regen-similarity" class="regen-slider" min="0" max="100" value="75" 
+                   oninput="window.updateRegenSlider('similarity')">
+          </div>
+          
+          <div class="regen-slider-group">
+            <div class="regen-slider-label">
+              <span>Style</span>
+              <span id="regen-style-value">0%</span>
+            </div>
+            <input type="range" id="regen-style" class="regen-slider" min="0" max="100" value="0" 
+                   oninput="window.updateRegenSlider('style')">
+          </div>
+        </div>
+        
+        <div class="regen-modal-buttons">
+          <button class="btn btn-secondary" onclick="window.closeRegenModal()">Cancel</button>
+          <button class="btn btn-warning" onclick="window.previewRegenAudio()">🔊 Preview</button>
+          <button class="btn btn-primary" onclick="window.confirmRegenerate()">🚀 Regenerate</button>
+        </div>
+        
+        <div id="regen-status" class="status-message" style="margin-top: 15px;"></div>
+      </div>
+    </div>
+    
+    <!-- Module 3: Slides to Sheets -->
+    <div id="slides-to-sheets" class="module-container">
+      <div class="card">
+        <h2>📑 Extract Slides to Spreadsheet</h2>
+        
+        <div class="form-group">
+          <label>Select Presentation:</label>
+          <select id="s2sh-presentationSelect" class="form-control" onchange="window.updateS2ShPresentationUrl()">
+            <option value="">-- Select a presentation --</option>
+          </select>
+          <input type="url" id="s2sh-presentationUrl" class="form-control" placeholder="Or paste presentation URL here" style="margin-top: 10px;">
+          <button class="btn btn-secondary" onclick="window.refreshS2ShPresentations()">🔄 Refresh</button>
+        </div>
+        
+        <div class="form-group">
+          <label>Select Spreadsheet (optional - will auto-detect if blank):</label>
+          <select id="s2sh-spreadsheetSelect" class="form-control" onchange="window.updateS2ShSpreadsheetUrl()">
+            <option value="">-- Auto-detect or select --</option>
+          </select>
+          <input type="url" id="s2sh-spreadsheetUrl" class="form-control" placeholder="Or paste spreadsheet URL here" style="margin-top: 10px;">
+          <button class="btn btn-secondary" onclick="window.refreshS2ShSpreadsheets()">🔄 Refresh</button>
+        </div>
+        
+        <div>
+          <button class="btn btn-primary" onclick="window.extractToSheets()">🚀 Extract to Sheet</button>
+          <button class="btn btn-secondary" onclick="window.previewSlideContents()">👁️ Preview Contents</button>
+          <button class="btn btn-secondary" onclick="window.viewMapping()">📋 View Mapping</button>
+          <button class="btn btn-secondary" onclick="window.clearS2ShForm()">🔄 Clear</button>
+        </div>
+        
+        <div id="s2sh-status" class="status-message"></div>
+        
+        <div id="s2sh-preview" style="display: none; margin-top: 20px;">
+          <h3>Slide Contents & Mapping</h3>
+          <div id="s2sh-contentList" style="max-height: 400px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px;"></div>
+        </div>
+        
+        <div id="s2sh-updates" style="display: none; margin-top: 20px; padding: 20px; background: #e8f5e9; border-radius: 8px;">
+          <h3 style="color: #2e7d32;">Updates Made:</h3>
+          <div id="s2sh-updatesList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>⚙️ Global Settings</h2>
+        <button class="modal-close" onclick="window.closeSettings()">&times;</button>
+      </div>
+      
+      <div class="tabs">
+        <button class="tab active" onclick="window.switchSettingsTab('aws')">AWS S3</button>
+        <button class="tab" onclick="window.switchSettingsTab('elevenlabs')">ElevenLabs</button>
+        <button class="tab" onclick="window.switchSettingsTab('voice')">Voice Settings</button>
+      </div>
+      
+      <!-- AWS Tab -->
+      <div id="aws-tab" class="tab-content active">
+        <h3>☁️ AWS S3 Configuration</h3>
+        <div class="form-group">
+          <label>AWS Access Key:</label>
+          <input type="text" id="settings-awsAccessKey" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>AWS Secret Key:</label>
+          <input type="password" id="settings-awsSecretKey" class="form-control" placeholder="Leave blank to keep existing">
+        </div>
+        <div class="form-group">
+          <label>S3 Bucket:</label>
+          <input type="text" id="settings-s3Bucket" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>AWS Region:</label>
+          <select id="settings-s3Region" class="form-control">
+            <option value="us-east-1">US East (N. Virginia)</option>
+            <option value="us-east-2">US East (Ohio)</option>
+            <option value="us-west-1">US West (N. California)</option>
+            <option value="us-west-2">US West (Oregon)</option>
+            <option value="eu-west-1">EU (Ireland)</option>
+            <option value="eu-central-1">EU (Frankfurt)</option>
+            <option value="ap-southeast-1">Asia Pacific (Singapore)</option>
+            <option value="ap-northeast-1">Asia Pacific (Tokyo)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>S3 Base URL:</label>
+          <input type="text" id="settings-s3BaseUrl" class="form-control" placeholder="https://your-bucket.s3.amazonaws.com/">
+        </div>
+        <div class="form-group">
+          <label>S3 Audio Folder Path:</label>
+          <input type="text" id="settings-s3Path" class="form-control" placeholder="e.g., audio/ or ek-audio/2024/" oninput="window.updatePathPreview()">
+          <small style="color: #666;">The folder path in your S3 bucket where audio files will be saved. Must end with /</small>
+          <div class="path-preview" id="pathPreview"></div>
+        </div>
+        <button class="btn btn-warning" onclick="window.testS3Connection()">🔧 Test S3 Connection</button>
+      </div>
+      
+      <!-- ElevenLabs Tab -->
+      <div id="elevenlabs-tab" class="tab-content">
+        <h3>🎙️ ElevenLabs Configuration</h3>
+        <div class="form-group">
+          <label>API Key:</label>
+          <input type="password" id="settings-elevenLabsApiKey" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Voice ID:</label>
+          <select id="settings-voiceId" class="form-control">
+            <option value="">-- Select a voice --</option>
+          </select>
+          <button class="btn btn-secondary" onclick="window.loadVoices()">Load Voices</button>
+        </div>
+        <div class="form-group">
+          <label>Model:</label>
+          <select id="settings-modelId" class="form-control">
+            <option value="eleven_monolingual_v1">Monolingual v1 (English only)</option>
+            <option value="eleven_turbo_v2">Turbo v2</option>
+            <option value="eleven_turbo_v2_5">Turbo v2.5</option>
+            <option value="eleven_multilingual_v2">Multilingual v2</option>
+          </select>
+        </div>
+        <button class="btn btn-warning" onclick="window.testElevenLabsConnection()">🔧 Test Voice</button>
+      </div>
+      
+      <!-- Voice Settings Tab -->
+      <div id="voice-tab" class="tab-content">
+        <h3>🎛️ Voice Settings</h3>
+        <div class="form-group">
+          <label>Stability: <span id="stabilityValue">50%</span></label>
+          <input type="range" id="settings-stability" min="0" max="100" value="50" oninput="window.updateSliderValue('stability')">
+        </div>
+        <div class="form-group">
+          <label>Similarity: <span id="similarityValue">75%</span></label>
+          <input type="range" id="settings-similarity" min="0" max="100" value="75" oninput="window.updateSliderValue('similarity')">
+        </div>
+        <div class="form-group">
+          <label>Style: <span id="styleValue">0%</span></label>
+          <input type="range" id="settings-style" min="0" max="100" value="0" oninput="window.updateSliderValue('style')">
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="settings-speakerBoost" checked> Use Speaker Boost
+          </label>
+        </div>
+      </div>
+      
+      <div style="margin-top: 20px; text-align: right;">
+        <button class="btn btn-secondary" onclick="window.closeSettings()">Cancel</button>
+        <button class="btn btn-primary" onclick="window.saveAllSettings()">Save Settings</button>
+      </div>
+      
+      <div id="settings-status" class="status-message"></div>
+    </div>
+  </div>
+  
+  <script>
+    // Error handler for debugging
+    window.onerror = function(msg, url, line, col, error) {
+      console.error('Error: ', msg, 'Line:', line);
+      return false;
+    };
+    
+    // Global variables - attached to window for GAS compatibility
+    window.currentModule = 'sheets-to-slides';
+    window.selectedAESpreadsheet = null;
+    window.s2sBadgeImageData = null;
+    window.currentTestAudio = null;
+    window.aePreviewData = null;
+    window.activeIntervals = [];
+    window.currentRegenIndex = null;
+    window.aeGenerationComplete = false;
+    
+    // Module load state tracking
+    window.moduleLoadState = {
+      'sheets-to-slides': false,
+      'audio-export': false,
+      'slides-to-sheets': false
+    };
+    
+    // Core Module Functions
+    window.switchModule = function(moduleName) {
+      window.currentModule = moduleName;
+      
+      // Update navigation
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      document.querySelectorAll('.nav-item').forEach(item => {
+        if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(moduleName)) {
+          item.classList.add('active');
+        }
+      });
+      
+      // Switch content
+      document.querySelectorAll('.module-container').forEach(container => {
+        container.classList.remove('active');
+      });
+      
+      document.getElementById(moduleName).classList.add('active');
+      
+      // Lazy load module data
+      if (!window.moduleLoadState[moduleName]) {
+        window.loadModuleData(moduleName);
+        window.moduleLoadState[moduleName] = true;
+      }
+      
+      window.stopCurrentAudio();
+    }
+    
+    window.loadModuleData = function(moduleName) {
+      switch(moduleName) {
+        case 'sheets-to-slides':
+          window.refreshS2SSheets();
+          break;
+        case 'audio-export':
+          window.loadAESpreadsheets();
+          break;
+        case 'slides-to-sheets':
+          window.refreshS2ShPresentations();
+          window.refreshS2ShSpreadsheets();
+          break;
+      }
+    }
+    
+    // Settings Functions
+    window.showSettings = function() {
+      document.getElementById('settingsModal').style.display = 'block';
+      window.loadCurrentSettings();
+    }
+    
+    window.closeSettings = function() {
+      document.getElementById('settingsModal').style.display = 'none';
+    }
+    
+    window.switchSettingsTab = function(tabName) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(tab => {
+        if (tab.getAttribute('onclick') && tab.getAttribute('onclick').includes(tabName)) {
+          tab.classList.add('active');
+        }
+      });
+      
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(tabName + '-tab').classList.add('active');
+    }
+    
+    // Module 1: Sheets to Slides Functions
+    window.refreshS2SSheets = function() {
+      const select = document.getElementById('s2s-sheetSelect');
+      select.innerHTML = '<option value="">Loading...</option>';
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              select.innerHTML = '<option value="">-- Select a spreadsheet --</option>';
+              result.files.forEach(file => {
+                const option = document.createElement('option');
+                option.value = file.url;
+                option.textContent = file.name;
+                select.appendChild(option);
+              });
+            } else {
+              select.innerHTML = '<option value="">Error loading spreadsheets</option>';
+            }
+          })
+          .withFailureHandler(function(error) {
+            select.innerHTML = '<option value="">Error loading spreadsheets</option>';
+            console.error('Error loading sheets:', error);
+          })
+          .getEKSheets();
+      } else {
+        select.innerHTML = '<option value="">Google Apps Script not available</option>';
+      }
+    }
+    
+    window.updateS2SSheetUrl = function() {
+      const select = document.getElementById('s2s-sheetSelect');
+      document.getElementById('s2s-sheetUrl').value = select.value;
+    }
+    
+    window.previewBadge = function() {
+      const input = document.getElementById('s2s-badgeImage');
+      const preview = document.getElementById('s2s-badgePreview');
+      
+      if (!input.files || !input.files[0]) {
+        preview.style.display = 'none';
+        window.s2sBadgeImageData = null;
+        return;
+      }
+      
+      const file = input.files[0];
+      if (!file.type.startsWith('image/')) {
+        window.showStatus('s2s-status', 'Please select a valid image file', 'error');
+        input.value = '';
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.querySelector('img').src = e.target.result;
+        preview.style.display = 'block';
+        window.s2sBadgeImageData = {
+          data: e.target.result.split(',')[1],
+          name: file.name,
+          type: file.type
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    window.generateSlides = function() {
+      const sheetUrl = document.getElementById('s2s-sheetUrl').value || 
+                       document.getElementById('s2s-sheetSelect').value;
+      const templateId = document.getElementById('s2s-templateId').value;
+      
+      if (!sheetUrl) {
+        window.showStatus('s2s-status', 'Please select or enter a spreadsheet URL', 'error');
+        return;
+      }
+      
+      window.showStatus('s2s-status', 'Generating slides...', 'info');
+      window.disableButtons(true);
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(window.handleS2SSuccess)
+          .withFailureHandler(window.handleS2SError)
+          .processSheet(sheetUrl, templateId, window.s2sBadgeImageData);
+      }
+    }
+    
+    window.clearS2SForm = function() {
+      document.getElementById('s2s-sheetUrl').value = '';
+      document.getElementById('s2s-sheetSelect').value = '';
+      document.getElementById('s2s-templateId').value = '';
+      document.getElementById('s2s-badgeImage').value = '';
+      document.getElementById('s2s-badgePreview').style.display = 'none';
+      document.getElementById('s2s-result').style.display = 'none';
+      window.s2sBadgeImageData = null;
+      window.hideStatus('s2s-status');
+    }
+    
+    window.handleS2SSuccess = function(response) {
+      window.disableButtons(false);
+      if (response.success) {
+        window.showStatus('s2s-status', 'Slides generated successfully!', 'success');
+        const result = document.getElementById('s2s-result');
+        document.getElementById('s2s-presentationName').textContent = response.name;
+        document.getElementById('s2s-textReplacements').textContent = response.replacements;
+        document.getElementById('s2s-imageReplacements').textContent = response.imageReplacements;
+        document.getElementById('s2s-presentationLink').href = response.url;
+        result.style.display = 'block';
+      } else {
+        window.showStatus('s2s-status', 'Error: ' + response.error, 'error');
+      }
+    }
+    
+    window.handleS2SError = function(error) {
+      window.disableButtons(false);
+      window.showStatus('s2s-status', 'Error: ' + error.message, 'error');
+    }
+    
+    // Module 2: Audio Export Functions with Regeneration
+    window.loadAESpreadsheets = function() {
+      const listDiv = document.getElementById('ae-spreadsheetList');
+      listDiv.innerHTML = '<div style="text-align: center; padding: 20px;"><span class="loading-spinner"></span> Loading spreadsheets...</div>';
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              window.displayAESpreadsheets(result.files || result.spreadsheets);
+            } else {
+              listDiv.innerHTML = '<div style="text-align: center; padding: 20px; color: #d93025;">Error loading spreadsheets</div>';
+            }
+          })
+          .withFailureHandler(function(error) {
+            listDiv.innerHTML = '<div style="text-align: center; padding: 20px; color: #d93025;">Error loading spreadsheets</div>';
+          })
+          .getRecentSpreadsheets();
+      }
+    }
+    
+    window.refreshAESpreadsheets = function() {
+      document.getElementById('ae-searchInput').value = '';
+      window.loadAESpreadsheets();
+    }
+    
+    window.searchAESpreadsheets = function() {
+      const searchTerm = document.getElementById('ae-searchInput').value.trim();
+      const listDiv = document.getElementById('ae-spreadsheetList');
+      
+      if (!searchTerm) {
+        window.loadAESpreadsheets();
+        return;
+      }
+      
+      listDiv.innerHTML = '<div style="text-align: center; padding: 20px;"><span class="loading-spinner"></span> Searching...</div>';
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              window.displayAESpreadsheets(result.spreadsheets);
+            } else {
+              listDiv.innerHTML = '<div style="text-align: center; padding: 20px; color: #d93025;">Search failed</div>';
+            }
+          })
+          .withFailureHandler(function(error) {
+            listDiv.innerHTML = '<div style="text-align: center; padding: 20px; color: #d93025;">Search failed</div>';
+          })
+          .searchSpreadsheets(searchTerm);
+      }
+    }
+    
+    window.selectAESpreadsheet = function(id, name) {
+      window.selectedAESpreadsheet = id;
+      document.querySelectorAll('#ae-spreadsheetList .file-item').forEach(item => {
+        if (item.dataset.id === id) {
+          item.classList.add('selected');
+        } else {
+          item.classList.remove('selected');
+        }
+      });
+      window.showStatus('ae-status', 'Selected: ' + name, 'info');
+      document.getElementById('ae-preview').style.display = 'none';
+      window.aePreviewData = null;
+    }
+    
+    window.displayAESpreadsheets = function(spreadsheets) {
+      const listDiv = document.getElementById('ae-spreadsheetList');
+      
+      if (!spreadsheets || spreadsheets.length === 0) {
+        listDiv.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">No spreadsheets found</div>';
+        return;
+      }
+      
+      listDiv.innerHTML = '';
+      spreadsheets.forEach(sheet => {
+        const date = new Date(sheet.lastUpdated);
+        const dateStr = date.toLocaleDateString();
+        
+        const item = document.createElement('div');
+        item.className = 'file-item';
+        item.dataset.id = sheet.id;
+        item.innerHTML = `
+          <div>
+            <div style="font-weight: 500;">${window.escapeHtml(sheet.name)}</div>
+            <div style="font-size: 12px; color: #666;">Updated: ${dateStr}</div>
+          </div>
+        `;
+        item.onclick = function() {
+          window.selectAESpreadsheet(sheet.id, sheet.name);
+        };
+        listDiv.appendChild(item);
+      });
+    }
+    
+    window.generateAudioPreview = function() {
+      if (!window.selectedAESpreadsheet) {
+        window.showStatus('ae-status', 'Please select a spreadsheet first', 'error');
+        return;
+      }
+      
+      const skipExisting = document.getElementById('ae-skipExisting').checked;
+      const testMode = document.getElementById('ae-testMode').checked;
+      
+      window.showStatus('ae-status', 'Generating preview...', 'info');
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            if (response.success) {
+              window.aePreviewData = response.preview;
+              window.displayAEPreview(response.preview);
+              window.showStatus('ae-status', 'Preview generated', 'success');
+            } else {
+              window.showStatus('ae-status', 'Preview failed: ' + response.error, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            window.showStatus('ae-status', 'Error: ' + error.message, 'error');
+          })
+          .generatePreviewData(window.selectedAESpreadsheet, {skipExisting, testMode});
+      }
+    }
+    
+    window.displayAEPreview = function(preview) {
+      const previewDiv = document.getElementById('ae-preview');
+      const contentDiv = document.getElementById('ae-previewContent');
+      
+      // Store preview data for regeneration
+      window.aePreviewData = preview;
+      
+      let html = '';
+      if (preview.s3Path) {
+        html += `<div style="padding: 10px; background: #e3f2fd; border-radius: 6px; margin-bottom: 15px;">
+          <strong>S3 Path:</strong> ${preview.bucketUrl || ''}${preview.s3Path}
+        </div>`;
+      }
+      
+      html += '<table style="width: 100%; border-collapse: collapse;">';
+      html += '<tr style="background: #f8f9fa; font-weight: 500;">';
+      html += '<th style="padding: 8px; text-align: left;">Row</th>';
+      html += '<th style="padding: 8px; text-align: left;">Field</th>';
+      html += '<th style="padding: 8px; text-align: left;">Text</th>';
+      html += '<th style="padding: 8px; text-align: left;">Filename</th>';
+      html += '<th style="padding: 8px; text-align: left;">Status</th>';
+      html += '<th style="padding: 8px; text-align: left;">Actions</th>';
+      html += '</tr>';
+      
+      preview.items.forEach((item, index) => {
+        const truncatedText = item.text && item.text.length > 50 ? 
+          item.text.substring(0, 50) + '...' : item.text;
+        const rowStyle = item.skipped ? 'opacity: 0.6; background: #f8f9fa;' : '';
+        
+        html += `<tr style="border-bottom: 1px solid #e0e0e0; ${rowStyle}">`;
+        html += `<td style="padding: 8px;">${item.row}</td>`;
+        html += `<td style="padding: 8px;">${item.field}</td>`;
+        html += `<td style="padding: 8px;" title="${window.escapeHtml(item.text || '')}">${window.escapeHtml(truncatedText || '')}</td>`;
+        html += `<td style="padding: 8px; font-family: monospace; font-size: 12px;">${item.filename}</td>`;
+        html += `<td style="padding: 8px;">`;
+        
+        if (item.hasAudio) {
+          html += '<span class="audio-status-badge has-audio">Has Audio</span>';
+        } else if (item.skipped) {
+          html += '<span style="color: #999;">Skipped</span>';
+        } else {
+          html += '<span class="audio-status-badge no-audio">No Audio</span>';
+        }
+        
+        html += '</td>';
+        html += '<td style="padding: 8px;">';
+        
+        if (!item.skipped && item.text && item.text.trim()) {
+          html += `<button class="audio-test-btn" onclick="window.testAudioPreview('${encodeURIComponent(item.text)}', ${index})" id="ae-testBtn-${index}" style="margin-right: 5px;">🔊 Test</button>`;
+          
+          // Add regenerate button if audio already exists or after initial generation
+          if (item.hasAudio || window.aeGenerationComplete) {
+            html += `<button class="regen-btn" onclick="window.openRegenModal(${index})">🔄 Regenerate</button>`;
+          }
+        } else if (item.skipped) {
+          html += '<span style="color: #999;">-</span>';
+        } else {
+          html += '<span style="color: #999;">-</span>';
+        }
+        
+        html += '</td></tr>';
+      });
+      html += '</table>';
+      
+      contentDiv.innerHTML = html;
+      previewDiv.style.display = 'block';
+    }
+    
+    // Audio Regeneration Modal Functions
+    window.openRegenModal = function(index) {
+      if (!window.aePreviewData || !window.aePreviewData.items[index]) {
+        window.showStatus('ae-status', 'Preview data not available', 'error');
+        return;
+      }
+      
+      const item = window.aePreviewData.items[index];
+      window.currentRegenIndex = index;
+      
+      // Set modal content
+      document.getElementById('regen-filename').textContent = 'Filename: ' + item.filename;
+      document.getElementById('regen-text').value = item.text || '';
+      
+      // Load current voice settings
+      window.loadRegenVoiceSettings();
+      
+      // Show modal
+      document.getElementById('audioRegenModal').classList.add('active');
+    };
+    
+    window.closeRegenModal = function() {
+      document.getElementById('audioRegenModal').classList.remove('active');
+      window.currentRegenIndex = null;
+      window.hideStatus('regen-status');
+      window.stopCurrentAudio();
+    };
+    
+    window.updateRegenSlider = function(type) {
+      const value = document.getElementById(`regen-${type}`).value;
+      document.getElementById(`regen-${type}-value`).textContent = value + '%';
+    };
+    
+    window.loadRegenVoiceSettings = function() {
+      // Load from global settings if available
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(settings) {
+            if (settings && settings.voiceSettings) {
+              const vs = settings.voiceSettings;
+              if (vs.stability !== undefined) {
+                document.getElementById('regen-stability').value = vs.stability;
+                window.updateRegenSlider('stability');
+              }
+              if (vs.similarity !== undefined) {
+                document.getElementById('regen-similarity').value = vs.similarity;
+                window.updateRegenSlider('similarity');
+              }
+              if (vs.style !== undefined) {
+                document.getElementById('regen-style').value = vs.style;
+                window.updateRegenSlider('style');
+              }
+            }
+          })
+          .getSettings();
+      }
+    };
+    
+    window.previewRegenAudio = function() {
+      const text = document.getElementById('regen-text').value.trim();
+      
+      if (!text) {
+        window.showStatus('regen-status', 'Please enter text to convert', 'error');
+        return;
+      }
+      
+      window.stopCurrentAudio();
+      window.showStatus('regen-status', 'Generating preview audio...', 'info');
+      
+      const voiceSettings = {
+        stability: parseInt(document.getElementById('regen-stability').value),
+        similarity: parseInt(document.getElementById('regen-similarity').value),
+        style: parseInt(document.getElementById('regen-style').value),
+        speakerBoost: true
+      };
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            if (response.success && response.audioBase64) {
+              window.playAudioFromBase64(response.audioBase64);
+              window.showStatus('regen-status', 'Playing preview audio', 'success');
+            } else {
+              window.showStatus('regen-status', 'Failed to generate preview audio', 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            window.showStatus('regen-status', 'Preview failed: ' + error.message, 'error');
+          })
+          .generateTestAudioWithSettings(text, voiceSettings);
+      }
+    };
+    
+    window.confirmRegenerate = function() {
+      if (window.currentRegenIndex === null || !window.aePreviewData) {
+        window.showStatus('regen-status', 'No item selected for regeneration', 'error');
+        return;
+      }
+      
+      const text = document.getElementById('regen-text').value.trim();
+      
+      if (!text) {
+        window.showStatus('regen-status', 'Please enter text to convert', 'error');
+        return;
+      }
+      
+      if (!window.selectedAESpreadsheet) {
+        window.showStatus('regen-status', 'No spreadsheet selected', 'error');
+        return;
+      }
+      
+      const item = window.aePreviewData.items[window.currentRegenIndex];
+      
+      if (!confirm(`Are you sure you want to regenerate audio for:\nRow ${item.row}, ${item.field}?`)) {
+        return;
+      }
+      
+      window.showStatus('regen-status', 'Regenerating audio file...', 'info');
+      
+      const voiceSettings = {
+        stability: parseInt(document.getElementById('regen-stability').value),
+        similarity: parseInt(document.getElementById('regen-similarity').value),
+        style: parseInt(document.getElementById('regen-style').value),
+        speakerBoost: true
+      };
+      
+      // Create an entry object that matches the expected format
+      const entry = {
+        row: item.row,
+        column: item.column || 4, // Default to column 4 (D) if not specified
+        header: item.field,
+        label: `${item.row} - ${item.field}`,
+        text: text,
+        currentUrl: item.s3Url || '',
+        hasAudio: item.hasAudio || false,
+        isDrill: item.isDrill || false
+      };
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            if (response.success) {
+              window.showStatus('regen-status', 'Audio regenerated successfully!', 'success');
+              
+              // Update the preview data
+              window.aePreviewData.items[window.currentRegenIndex].text = text;
+              window.aePreviewData.items[window.currentRegenIndex].hasAudio = true;
+              
+              // Refresh the preview display
+              window.displayAEPreview(window.aePreviewData);
+              
+              setTimeout(() => {
+                window.closeRegenModal();
+              }, 1500);
+            } else {
+              window.showStatus('regen-status', 'Regeneration failed: ' + response.error, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            window.showStatus('regen-status', 'Error: ' + error.message, 'error');
+          })
+          .regenerateAudioFiles(window.selectedAESpreadsheet, [entry], voiceSettings);
+      }
+    };
+    
+    window.testAudioPreview = function(encodedText, index) {
+      const text = decodeURIComponent(encodedText);
+      const btn = document.getElementById('ae-testBtn-' + index);
+      
+      if (!text || !text.trim()) {
+        window.showStatus('ae-status', 'No text to convert', 'error');
+        return;
+      }
+      
+      window.stopCurrentAudio();
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading-spinner" style="width: 12px; height: 12px; border-width: 2px;"></span> Testing...';
+      
+      window.showStatus('ae-status', 'Generating test audio...', 'info');
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            btn.disabled = false;
+            btn.innerHTML = '🔊 Test';
+            if (response.success && response.audioBase64) {
+              window.playAudioFromBase64(response.audioBase64);
+              window.showStatus('ae-status', 'Playing test audio', 'success');
+            } else {
+              window.showStatus('ae-status', 'Failed to generate test audio', 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            btn.disabled = false;
+            btn.innerHTML = '🔊 Test';
+            window.showStatus('ae-status', 'Test failed: ' + error.message, 'error');
+          })
+          .generateTestAudio(text);
+      }
+    }
+    
+    window.processAudioExport = function() {
+      if (!window.selectedAESpreadsheet) {
+        window.showStatus('ae-status', 'Please select a spreadsheet first', 'error');
+        return;
+      }
+      
+      window.stopCurrentAudio();
+      window.clearAllIntervals();
+      
+      const skipExisting = document.getElementById('ae-skipExisting').checked;
+      const testMode = document.getElementById('ae-testMode').checked;
+      
+      window.showStatus('ae-status', 'Processing audio generation and CSV export...', 'info');
+      document.getElementById('ae-progress').style.display = 'block';
+      document.getElementById('ae-progressFill').style.width = '0%';
+      document.getElementById('ae-progressText').textContent = 'Starting...';
+      
+      window.disableButtons(true);
+      
+      if (google && google.script && google.script.run) {
+        // Start progress polling
+        let progressInterval = setInterval(() => {
+          document.getElementById('ae-progressFill').style.width = Math.min(
+            parseInt(document.getElementById('ae-progressFill').style.width) + 5, 90
+          ) + '%';
+        }, 1000);
+        
+        window.activeIntervals.push(progressInterval);
+        
+        google.script.run
+          .withSuccessHandler(function(response) {
+            clearInterval(progressInterval);
+            window.clearAllIntervals();
+            document.getElementById('ae-progressFill').style.width = '100%';
+            document.getElementById('ae-progressText').textContent = 'Complete!';
+            window.disableButtons(false);
+            
+            if (response.success) {
+              window.aeGenerationComplete = true;
+              window.showStatus('ae-status', 'Audio generation and CSV export completed!', 'success');
+              window.displayAEResults(response);
+              
+              // Refresh preview to show regenerate buttons
+              if (window.aePreviewData) {
+                window.displayAEPreview(window.aePreviewData);
+              }
+            } else {
+              window.showStatus('ae-status', 'Processing failed: ' + response.error, 'error');
+            }
+            
+            setTimeout(() => {
+              document.getElementById('ae-progress').style.display = 'none';
+            }, 2000);
+          })
+          .withFailureHandler(function(error) {
+            clearInterval(progressInterval);
+            window.clearAllIntervals();
+            window.disableButtons(false);
+            document.getElementById('ae-progress').style.display = 'none';
+            window.showStatus('ae-status', 'Error: ' + error.message, 'error');
+          })
+          .processSpreadsheetWithProgress(window.selectedAESpreadsheet, {skipExisting, testMode});
+      }
+    }
+    
+    window.displayAEResults = function(response) {
+      const resultsDiv = document.getElementById('ae-results');
+      
+      let html = '<div style="padding: 20px; background: #e8f5e9; border-radius: 8px;">';
+      html += '<h3 style="color: #2e7d32;">✅ Processing Complete!</h3>';
+      
+      if (response.summary) {
+        html += '<div style="margin-top: 15px;">';
+        html += `<p><strong>Total Rows Processed:</strong> ${response.summary.processedRows}</p>`;
+        html += `<p><strong>Audio Files Generated:</strong> ${response.summary.totalAudioSuccess} / ${response.summary.totalAudioGenerated}</p>`;
+        
+        if (response.summary.csvFile) {
+          html += '<p style="margin-top: 10px;"><strong>CSV Export:</strong></p>';
+          html += `<p>📄 ${response.summary.csvFile.name}</p>`;
+          html += `<p><a href="${response.summary.csvFile.url}" target="_blank" style="color: #1a73e8; font-weight: bold;">Download CSV File</a></p>`;
+        }
+        html += '</div>';
+      }
+      
+      if (response.results && response.results.length > 0) {
+        html += '<details style="margin-top: 20px;">';
+        html += '<summary style="cursor: pointer; font-weight: bold;">View Details</summary>';
+        html += '<div style="margin-top: 10px; max-height: 300px; overflow-y: auto;">';
+        
+        response.results.forEach(result => {
+          html += '<div style="padding: 10px; border-bottom: 1px solid #e0e0e0;">';
+          html += `<strong>Row ${result.row}:</strong> ${result.code}<br>`;
+          html += `Audio Generated: ${result.success} / ${result.audioGenerated}`;
+          
+          if (result.details && result.details.length > 0) {
+            html += '<ul style="margin-top: 5px; font-size: 12px;">';
+            result.details.forEach(detail => {
+              if (detail.success) {
+                html += `<li style="color: #2e7d32;">✓ ${detail.field}: ${detail.filename}</li>`;
+              } else {
+                html += `<li style="color: #c62828;">✗ ${detail.field}: ${detail.error || 'Failed'}</li>`;
+              }
+            });
+            html += '</ul>';
+          }
+          html += '</div>';
+        });
+        
+        html += '</div></details>';
+      }
+      
+      html += '</div>';
+      resultsDiv.innerHTML = html;
+      resultsDiv.style.display = 'block';
+    }
+    
+    window.testAudioConnections = function() {
+      window.showStatus('ae-status', 'Testing connections...', 'info');
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(results) {
+            let message = '';
+            let status = 'success';
+            
+            if (results.s3 && results.s3.success) {
+              message += '✅ S3 Connection: OK\n';
+            } else {
+              message += '❌ S3 Connection: ' + (results.s3 ? results.s3.error : 'Failed') + '\n';
+              status = 'error';
+            }
+            
+            if (results.elevenlabs && results.elevenlabs.success) {
+              message += '✅ ElevenLabs Connection: OK';
+            } else {
+              message += '❌ ElevenLabs Connection: ' + (results.elevenlabs ? results.elevenlabs.message : 'Failed');
+              status = 'error';
+            }
+            
+            window.showStatus('ae-status', message, status);
+          })
+          .withFailureHandler(function(error) {
+            window.showStatus('ae-status', 'Connection test failed: ' + error.message, 'error');
+          })
+          .testConnections();
+      }
+    }
+    
+    // Module 3: Slides to Sheets Functions
+    window.refreshS2ShPresentations = function() {
+      const select = document.getElementById('s2sh-presentationSelect');
+      select.innerHTML = '<option value="">Loading...</option>';
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              select.innerHTML = '<option value="">-- Select a presentation --</option>';
+              result.files.forEach(file => {
+                const option = document.createElement('option');
+                option.value = file.url;
+                option.textContent = file.name;
+                select.appendChild(option);
+              });
+            } else {
+              select.innerHTML = '<option value="">Error loading presentations</option>';
+            }
+          })
+          .withFailureHandler(function(error) {
+            select.innerHTML = '<option value="">Error loading presentations</option>';
+          })
+          .getPresentations();
+      }
+    }
+    
+    window.refreshS2ShSpreadsheets = function() {
+      const select = document.getElementById('s2sh-spreadsheetSelect');
+      select.innerHTML = '<option value="">Loading...</option>';
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              select.innerHTML = '<option value="">-- Auto-detect or select --</option>';
+              result.files.forEach(file => {
+                const option = document.createElement('option');
+                option.value = file.url;
+                option.textContent = file.name;
+                select.appendChild(option);
+              });
+            } else {
+              select.innerHTML = '<option value="">Error loading spreadsheets</option>';
+            }
+          })
+          .withFailureHandler(function(error) {
+            select.innerHTML = '<option value="">Error loading spreadsheets</option>';
+          })
+          .getEKSpreadsheets();
+      }
+    }
+    
+    window.updateS2ShPresentationUrl = function() {
+      const select = document.getElementById('s2sh-presentationSelect');
+      document.getElementById('s2sh-presentationUrl').value = select.value;
+    }
+    
+    window.updateS2ShSpreadsheetUrl = function() {
+      const select = document.getElementById('s2sh-spreadsheetSelect');
+      document.getElementById('s2sh-spreadsheetUrl').value = select.value;
+    }
+    
+    window.extractToSheets = function() {
+      const presentationUrl = document.getElementById('s2sh-presentationUrl').value || 
+                             document.getElementById('s2sh-presentationSelect').value;
+      const spreadsheetUrl = document.getElementById('s2sh-spreadsheetUrl').value || 
+                            document.getElementById('s2sh-spreadsheetSelect').value;
+      
+      if (!presentationUrl) {
+        window.showStatus('s2sh-status', 'Please select or enter a presentation URL', 'error');
+        return;
+      }
+      
+      window.showStatus('s2sh-status', 'Extracting slide content to spreadsheet...', 'info');
+      window.disableButtons(true);
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            window.disableButtons(false);
+            if (response.success) {
+              window.showStatus('s2sh-status', `Successfully updated ${response.updatedCells} cells!`, 'success');
+              window.displayS2ShUpdates(response);
+            } else {
+              window.showStatus('s2sh-status', 'Error: ' + response.error, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            window.disableButtons(false);
+            window.showStatus('s2sh-status', 'Error: ' + error.message, 'error');
+          })
+          .extractWithMapping(presentationUrl, spreadsheetUrl);
+      }
+    }
+    
+    window.previewSlideContents = function() {
+      const presentationUrl = document.getElementById('s2sh-presentationUrl').value || 
+                             document.getElementById('s2sh-presentationSelect').value;
+      
+      if (!presentationUrl) {
+        window.showStatus('s2sh-status', 'Please select or enter a presentation URL', 'error');
+        return;
+      }
+      
+      window.showStatus('s2sh-status', 'Loading slide contents...', 'info');
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            if (response.success) {
+              window.displayS2ShPreview(response.data);
+              window.showStatus('s2sh-status', 'Preview loaded', 'success');
+            } else {
+              window.showStatus('s2sh-status', 'Error: ' + response.error, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            window.showStatus('s2sh-status', 'Error: ' + error.message, 'error');
+          })
+          .viewSlideContents(presentationUrl);
+      }
+    }
+    
+    window.viewMapping = function() {
+      window.showStatus('s2sh-status', 'Loading mapping...', 'info');
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(mappings) {
+            window.displayS2ShMapping(mappings);
+            window.showStatus('s2sh-status', 'Mapping loaded', 'success');
+          })
+          .withFailureHandler(function(error) {
+            window.showStatus('s2sh-status', 'Error: ' + error.message, 'error');
+          })
+          .getMapping();
+      }
+    }
+    
+    window.displayS2ShPreview = function(data) {
+      const previewDiv = document.getElementById('s2sh-preview');
+      const contentList = document.getElementById('s2sh-contentList');
+      
+      let html = '<table style="width: 100%; border-collapse: collapse;">';
+      html += '<tr style="background: #f8f9fa; font-weight: 500;">';
+      html += '<th style="padding: 8px; text-align: left;">Slide</th>';
+      html += '<th style="padding: 8px; text-align: left;">Position</th>';
+      html += '<th style="padding: 8px; text-align: left;">Text</th>';
+      html += '<th style="padding: 8px; text-align: left;">Maps To</th>';
+      html += '</tr>';
+      
+      data.forEach(item => {
+        const truncatedText = item.text && item.text.length > 60 ? 
+          item.text.substring(0, 60) + '...' : item.text;
+        
+        html += '<tr style="border-bottom: 1px solid #e0e0e0;">';
+        html += `<td style="padding: 8px;">${item.slide}</td>`;
+        html += `<td style="padding: 8px;">${item.position}</td>`;
+        html += `<td style="padding: 8px;" title="${window.escapeHtml(item.text)}">${window.escapeHtml(truncatedText)}</td>`;
+        html += `<td style="padding: 8px; font-weight: ${item.mapped ? 'bold' : 'normal'}; color: ${item.mapped ? '#2e7d32' : '#999'};">`;
+        html += item.mapped || '-';
+        html += '</td></tr>';
+      });
+      
+      html += '</table>';
+      contentList.innerHTML = html;
+      previewDiv.style.display = 'block';
+    }
+    
+    window.displayS2ShMapping = function(mappings) {
+      const previewDiv = document.getElementById('s2sh-preview');
+      const contentList = document.getElementById('s2sh-contentList');
+      
+      let html = '<h4>Position to Cell Mapping</h4>';
+      html += '<table style="width: 100%; border-collapse: collapse; margin-top: 10px;">';
+      html += '<tr style="background: #f8f9fa; font-weight: 500;">';
+      html += '<th style="padding: 8px; text-align: left;">Source</th>';
+      html += '<th style="padding: 8px; text-align: left;">Target Cell</th>';
+      html += '</tr>';
+      
+      mappings.forEach(map => {
+        html += '<tr style="border-bottom: 1px solid #e0e0e0;">';
+        html += `<td style="padding: 8px;">${map.text}</td>`;
+        html += `<td style="padding: 8px; font-family: monospace; font-weight: bold;">${map.cell}</td>`;
+        html += '</tr>';
+      });
+      
+      html += '</table>';
+      contentList.innerHTML = html;
+      previewDiv.style.display = 'block';
+    }
+    
+    window.displayS2ShUpdates = function(response) {
+      const updatesDiv = document.getElementById('s2sh-updates');
+      const updatesList = document.getElementById('s2sh-updatesList');
+      
+      let html = `<p><strong>Total cells updated:</strong> ${response.updatedCells}</p>`;
+      
+      if (response.spreadsheetUrl) {
+        html += `<p><a href="${response.spreadsheetUrl}" target="_blank" style="color: #1a73e8; font-weight: bold;">Open Updated Spreadsheet</a></p>`;
+      }
+      
+      if (response.updates && response.updates.length > 0) {
+        html += '<details style="margin-top: 10px;">';
+        html += '<summary style="cursor: pointer;">View all updates</summary>';
+        html += '<ul style="margin-top: 10px;">';
+        
+        response.updates.forEach(update => {
+          const truncatedText = update.text && update.text.length > 50 ? 
+            update.text.substring(0, 50) + '...' : update.text;
+          html += `<li>Slide ${update.slide}, Pos ${update.position} → Cell ${update.cell}: "${window.escapeHtml(truncatedText)}"</li>`;
+        });
+        
+        html += '</ul></details>';
+      }
+      
+      updatesList.innerHTML = html;
+      updatesDiv.style.display = 'block';
+    }
+    
+    window.clearS2ShForm = function() {
+      document.getElementById('s2sh-presentationUrl').value = '';
+      document.getElementById('s2sh-presentationSelect').value = '';
+      document.getElementById('s2sh-spreadsheetUrl').value = '';
+      document.getElementById('s2sh-spreadsheetSelect').value = '';
+      document.getElementById('s2sh-preview').style.display = 'none';
+      document.getElementById('s2sh-updates').style.display = 'none';
+      window.hideStatus('s2sh-status');
+    }
+    
+    // Settings Functions
+    window.loadCurrentSettings = function() {
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(settings) {
+            if (settings.aws) {
+              document.getElementById('settings-awsAccessKey').value = settings.aws.accessKey || '';
+              document.getElementById('settings-awsSecretKey').value = '';
+              document.getElementById('settings-s3Bucket').value = settings.aws.bucket || '';
+              document.getElementById('settings-s3Region').value = settings.aws.region || 'us-east-1';
+              document.getElementById('settings-s3BaseUrl').value = settings.aws.baseUrl || '';
+              document.getElementById('settings-s3Path').value = settings.aws.s3Path || 'audio/';
+              window.updatePathPreview();
+            }
+            
+            if (settings.elevenlabs) {
+              document.getElementById('settings-elevenLabsApiKey').value = settings.elevenlabs.apiKey || '';
+              document.getElementById('settings-voiceId').value = settings.elevenlabs.voiceId || '';
+              document.getElementById('settings-modelId').value = settings.elevenlabs.modelId || 'eleven_monolingual_v1';
+            }
+            
+            if (settings.voiceSettings) {
+              document.getElementById('settings-stability').value = settings.voiceSettings.stability || 50;
+              document.getElementById('settings-similarity').value = settings.voiceSettings.similarity || 75;
+              document.getElementById('settings-style').value = settings.voiceSettings.style || 0;
+              document.getElementById('settings-speakerBoost').checked = settings.voiceSettings.speakerBoost !== false;
+              window.updateSliderValue('stability');
+              window.updateSliderValue('similarity');
+              window.updateSliderValue('style');
+            }
+          })
+          .getSettings();
+      }
+    }
+    
+    window.updatePathPreview = function() {
+      const baseUrl = document.getElementById('settings-s3BaseUrl').value;
+      const path = document.getElementById('settings-s3Path').value;
+      const preview = document.getElementById('pathPreview');
+      
+      if (baseUrl && path) {
+        preview.textContent = `Example: ${baseUrl}${path}example-audio.mp3`;
+      } else {
+        preview.textContent = 'Enter base URL and path to see preview';
+      }
+    }
+    
+    window.updateSliderValue = function(type) {
+      const value = document.getElementById('settings-' + type).value;
+      document.getElementById(type + 'Value').textContent = value + '%';
+    }
+    
+    window.loadVoices = function() {
+      const apiKey = document.getElementById('settings-elevenLabsApiKey').value;
+      
+      if (!apiKey) {
+        window.showStatus('settings-status', 'Please enter your ElevenLabs API key first', 'error');
+        return;
+      }
+      
+      window.showStatus('settings-status', 'Loading voices...', 'info');
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            if (response.success) {
+              const select = document.getElementById('settings-voiceId');
+              const currentValue = select.value;
+              select.innerHTML = '<option value="">-- Select a voice --</option>';
+              
+              response.voices.forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice.voice_id;
+                option.textContent = voice.name;
+                select.appendChild(option);
+              });
+              
+              select.value = currentValue;
+              window.showStatus('settings-status', 'Voices loaded successfully', 'success');
+            } else {
+              window.showStatus('settings-status', response.message, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            window.showStatus('settings-status', 'Failed to load voices', 'error');
+          })
+          .getVoices();
+      }
+    }
+    
+    window.saveAllSettings = function() {
+      const settings = {
+        aws: {
+          accessKey: document.getElementById('settings-awsAccessKey').value,
+          secretKey: document.getElementById('settings-awsSecretKey').value,
+          bucket: document.getElementById('settings-s3Bucket').value,
+          region: document.getElementById('settings-s3Region').value,
+          baseUrl: document.getElementById('settings-s3BaseUrl').value,
+          s3Path: document.getElementById('settings-s3Path').value
+        },
+        elevenlabs: {
+          apiKey: document.getElementById('settings-elevenLabsApiKey').value,
+          voiceId: document.getElementById('settings-voiceId').value,
+          modelId: document.getElementById('settings-modelId').value
+        },
+        voiceSettings: {
+          stability: parseInt(document.getElementById('settings-stability').value),
+          similarity: parseInt(document.getElementById('settings-similarity').value),
+          style: parseInt(document.getElementById('settings-style').value),
+          speakerBoost: document.getElementById('settings-speakerBoost').checked
+        }
+      };
+      
+      window.showStatus('settings-status', 'Saving settings...', 'info');
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            if (response.success) {
+              window.showStatus('settings-status', response.message, 'success');
+              setTimeout(() => {
+                window.closeSettings();
+              }, 1500);
+            } else {
+              window.showStatus('settings-status', response.message, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            window.showStatus('settings-status', 'Failed to save settings', 'error');
+          })
+          .saveSettings(settings);
+      }
+    }
+    
+    window.testS3Connection = function() {
+      window.showStatus('settings-status', 'Testing S3 connection...', 'info');
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.s3 && result.s3.success) {
+              window.showStatus('settings-status', '✅ S3 connection successful!', 'success');
+            } else {
+              window.showStatus('settings-status', '❌ S3 connection failed: ' + (result.s3 ? result.s3.error : 'Unknown error'), 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            window.showStatus('settings-status', 'Test failed: ' + error.message, 'error');
+          })
+          .testConnections();
+      }
+    }
+    
+    window.testElevenLabsConnection = function() {
+      window.showStatus('settings-status', 'Testing ElevenLabs connection...', 'info');
+      
+      if (google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.elevenlabs && result.elevenlabs.success) {
+              window.showStatus('settings-status', '✅ ElevenLabs connection successful!', 'success');
+            } else {
+              window.showStatus('settings-status', '❌ ElevenLabs connection failed: ' + (result.elevenlabs ? result.elevenlabs.message : 'Unknown error'), 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            window.showStatus('settings-status', 'Test failed: ' + error.message, 'error');
+          })
+          .testConnections();
+      }
+    }
+    
+    // Utility Functions
+    window.showStatus = function(elementId, message, type) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.textContent = message;
+        element.className = 'status-message status-' + type;
+        element.style.display = 'block';
+      }
+    }
+    
+    window.hideStatus = function(elementId) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.style.display = 'none';
+      }
+    }
+    
+    window.disableButtons = function(disabled) {
+      document.querySelectorAll('.btn').forEach(btn => {
+        btn.disabled = disabled;
+      });
+    }
+    
+    window.escapeHtml = function(text) {
+      const div = document.createElement('div');
+      div.textContent = text || '';
+      return div.innerHTML;
+    }
+    
+    window.playAudioFromBase64 = function(base64Data) {
+      window.stopCurrentAudio();
+      const audio = new Audio('data:audio/mp3;base64,' + base64Data);
+      audio.play();
+      window.currentTestAudio = audio;
+    }
+    
+    window.stopCurrentAudio = function() {
+      if (window.currentTestAudio) {
+        window.currentTestAudio.pause();
+        window.currentTestAudio = null;
+      }
+    }
+    
+    window.clearAllIntervals = function() {
+      window.activeIntervals.forEach(interval => clearInterval(interval));
+      window.activeIntervals = [];
+    }
+    
+    // Initialize on load
+    window.addEventListener('load', function() {
+      // Load initial module data
+      window.loadModuleData('sheets-to-slides');
+      window.moduleLoadState['sheets-to-slides'] = true;
+    });
+    
+    // Clean up on unload
+    window.addEventListener('beforeunload', function() {
+      window.stopCurrentAudio();
+      window.clearAllIntervals();
+    });
+  </script>
+</body>
+</html>
